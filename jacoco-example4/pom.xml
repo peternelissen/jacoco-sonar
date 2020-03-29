@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.2.4.RELEASE</version>
+		<relativePath/>
+	</parent>
+
+	<version>0.1-SNAPSHOT</version>
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>be.vdab.jacoco</groupId>
+	<artifactId>jacoco-example4</artifactId>
+
+	<packaging>pom</packaging>
+
+	<name>jacoco-example4</name>
+	<description>jacoco-example4</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<java.version>1.8</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+
+		<sonar.host.url>http://localhost:9000/</sonar.host.url>
+
+		<jacoco.reportDirectory.ut>${project.reporting.outputDirectory}/jacoco-ut</jacoco.reportDirectory.ut>
+		<jacoco.reportDirectory.aggregate>${project.reporting.outputDirectory}/jacoco-aggregate</jacoco.reportDirectory.aggregate>
+
+<!--		<sonar.coverage.jacoco.xmlReportPaths>${jacoco.reportDirectory.ut}/jacoco.xml,${jacoco.reportDirectory.aggregate}/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
+		<sonar.coverage.jacoco.xmlReportPaths>../jacoco-m1/target/site/jacoco-ut/jacoco.xml,../jacoco-m1/target/site/jacoco-aggregate/jacoco.xml,../jacoco-m2/target/site/jacoco-ut/jacoco.xml,../jacoco-m2/target/site/jacoco-aggregate/jacoco.xml,../jacoco-m3/target/site/jacoco-ut/jacoco.xml,../jacoco-m3/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+
+		<jacoco.version>0.8.5</jacoco.version>
+		<sonar-plugin.version>3.7.0.1746</sonar-plugin.version>
+		<sonar-jacoco-listeners.version>5.14.0.18788</sonar-jacoco-listeners.version>
+	</properties>
+
+	<modules>
+		<module>jacoco-m1</module>
+		<module>jacoco-m2</module>
+		<module>jacoco-m3</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>be.vdab.jacoco</groupId>
+				<artifactId>jacoco-m1</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.vdab.jacoco</groupId>
+				<artifactId>jacoco-m2</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>be.vdab.jacoco</groupId>
+				<artifactId>jacoco-m3</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.sonarsource.java</groupId>
+			<artifactId>sonar-jacoco-listeners</artifactId>
+			<version>${sonar-jacoco-listeners.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<!--suppress MavenModelInspection -->
+						<argLine>${jacoco.agent.ut.arg}</argLine>
+						<properties>
+							<property>
+								<name>listener</name>
+								<value>org.sonar.java.jacoco.JUnitListener</value>
+							</property>
+						</properties>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco.version}</version>
+					<executions>
+						<execution>
+							<id>prepare-agent-ut</id>
+							<goals>
+								<goal>prepare-agent</goal>
+							</goals>
+							<configuration>
+								<append>true</append>
+								<propertyName>jacoco.agent.ut.arg</propertyName>
+							</configuration>
+						</execution>
+						<execution>
+							<id>report-ut</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+							<configuration>
+								<skip>${coverage.skip}</skip>
+								<outputDirectory>${jacoco.reportDirectory.ut}</outputDirectory>
+							</configuration>
+						</execution>
+						<execution>
+							<id>report-aggregate</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>report-aggregate</goal>
+							</goals>
+							<configuration>
+								<skip>${coverage.skip}</skip>
+								<outputDirectory>${jacoco.reportDirectory.aggregate}</outputDirectory>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>${sonar-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.5.1</version>
+					<configuration>
+						<source>1.8</source>
+						<target>1.8</target>
+						<useIncrementalCompilation>false</useIncrementalCompilation>
+						<compilerArgs>
+							<arg>-Xlint:deprecation</arg>
+							<arg>-Xlint:unchecked</arg>
+						</compilerArgs>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
