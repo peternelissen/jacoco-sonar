@@ -24,7 +24,8 @@
 	<properties>
 		<!--suppress UnresolvedMavenProperty -->
 		<jacoco.ut.file>${maven.multiModuleProjectDirectory}/target/jacoco-ut.exec</jacoco.ut.file>
-		<sonar.jacoco.reportPath>${jacoco.ut.file}</sonar.jacoco.reportPath>
+		<!-- even when "sonar.coverage.jacoco.xmlreportpaths" is not defined, the report
+		     "target/site/jacoco/jacoco.xml" is imported by default  -->
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -101,6 +102,10 @@
 							</configuration>
 						</execution>
 					</executions>
+					<configuration>
+						<!-- used by the manually executed goal "report" -->
+						<dataFile>${jacoco.ut.file}</dataFile>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.sonarsource.scanner.maven</groupId>
